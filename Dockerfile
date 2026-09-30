@@ -12,13 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Resolve dependencies first (better build caching)
-COPY pom.xml .
-RUN mvn -q -B dependency:go-offline || true
-
-# Copy the source and build the app
+# Copy the source and build the app.
+# -U forces a fresh check so cached "not found" results for the JavaFX
+# platform classifiers (linux-aarch64) are re-resolved instead of failing.
 COPY . .
-RUN mvn -q -B -DskipTests clean package
+RUN mvn -q -B -U -DskipTests clean package
 
 # Software rendering (no GPU) + reach the MariaDB running on the host
 ENV _JAVA_OPTIONS="-Dprism.order=sw -Ddb.host=host.docker.internal"
