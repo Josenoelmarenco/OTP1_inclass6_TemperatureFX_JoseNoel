@@ -3,7 +3,10 @@
 # DISPLAY variable passed at "docker run". Software rendering is forced because
 # the container has no GPU.
 
-FROM maven:3.9-eclipse-temurin-21
+# Build for amd64: JavaFX publishes its Linux jars for x86_64 (the linux-aarch64
+# classifier is not on Maven Central), so we pin the platform. Docker Desktop on
+# Apple Silicon runs this image via emulation.
+FROM --platform=linux/amd64 maven:3.9-eclipse-temurin-21
 
 # Native libraries JavaFX needs to render on Linux
 RUN apt-get update && apt-get install -y --no-install-recommends \
